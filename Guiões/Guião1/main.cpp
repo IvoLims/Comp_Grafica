@@ -11,7 +11,7 @@
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 
-// Vari·veis
+// Vari√°veis
 
 float angulo_Y;
 float angulo_X;
@@ -79,37 +79,37 @@ void renderScene(void) {
 
 // put drawing instructions here
 
-	//Formar Tri‚ngulos
+	//Formar Tri√¢ngulos
 	glBegin(GL_TRIANGLES);
 	
 	// Parte de Base 
 	// Formato: (x,y,z)
-	// 1∫ Tri‚ngulo 
+	// 1¬∫ Tri√¢ngulo 
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(-1.0f, 0.0f, 1.0f);
 	glVertex3f(-1.0f, 0.0f, -1.0f);
 	glVertex3f(1.0f, 0.0f, 1.0f);
-	// 2∫ Tri‚ngulo
+	// 2¬∫ Tri√¢ngulo
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(1.0f, 0.0f, 1.0f);
 	glVertex3f(-1.0f, 0.0f, -1.0f);
 	glVertex3f(1.0f, 0.0f, -1.0f);
-	// Parte de Frente
+	// Tri√¢ngulo da Frente
 	glColor3f(0.13f, 0.54f, 0.13f);
 	glVertex3f(-1.0f, 0.0f, 1.0f);
 	glVertex3f(1.0f, 0.0f, 1.0f);
 	glVertex3f(0.0f, 3.0f, 0.0f);
-	// Parte de Direita
+	// Tri√¢ngulo da Direita
 	glColor3f(0.0f, 0.19f, 0.58f);
 	glVertex3f(1.0f, 0.0f, -1.0f);
 	glVertex3f(0.0f, 3.0f, 0.0f);
 	glVertex3f(1.0f, 0.0f, 1.0f);
-	// Parte de Tr·s
+	// Tri√¢ngulo de Tr√°s
 	glColor3f(0.9f, 0.39f, 0.0f);
 	glVertex3f(-1.0f, 0.0f, -1.0f);
 	glVertex3f(0.0f, 3.0f, 0.0f);
 	glVertex3f(1.0f, 0.0f, -1.0f);
-	// Parte de Esquerda
+	// Tri√¢ngulo da Esquerda
 	glColor3f(1.0f, 1.0f, 0.0f);
 	glVertex3f(-1.0f, 0.0f, 1.0f);
 	glVertex3f(0.0f, 3.0f, 0.0f);
@@ -140,6 +140,8 @@ void escala(unsigned char key, int x, int y) {
 	switch (key) {
 	case '+': scale_All += 0.2; break;
 	case '-': scale_All -= 0.2; break;
+	default:
+		break;
 	}
 	glutPostRedisplay();
 }
