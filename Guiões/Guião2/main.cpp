@@ -6,6 +6,8 @@
 
 #include <math.h>
 
+#define PI 3.1415926535897932384626433832795
+
 void changeSize(int w, int h) {
 
 	// Prevent a divide by zero, when window is too short
@@ -31,6 +33,89 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+// draw figures
+
+void drawPlane(float width) {
+	width/=2;
+
+	glBegin(GL_TRIANGLE_FAN);
+
+	glColor3f(4.0f, 1.0f, 1.0f);
+
+	glVertex3d(width, 0,width);
+	glVertex3d(width, 0, -width);
+	glVertex3d(-width, 0,-width);
+
+	glColor3f(3.0f, 1.0f, 0.0f);
+	
+	glVertex3d(width, 0, width);
+	glVertex3d(-width, 0, -width);
+	glVertex3d(-width, 0, width);
+	
+	glColor3f(0.0f, 0.0f, 1.0f);
+	
+	glVertex3d(width, 0, -width);
+	glVertex3d(width, 0, width);
+	glVertex3d(-width, 0, -width);
+	
+	glColor3f(1.0f, 1.0f, 1.0f);
+	
+	glVertex3d(-width, 0, -width);
+	glVertex3d(width, 0, width);
+	glVertex3d(-width, 0, width);
+
+	glEnd();
+}
+
+
+void drawCylinder(float radius, float height, int slices) {
+	float interval = 2 * PI / slices;
+	float next_a, next_h;
+
+	for (float a = 0; a < 2 * PI; a += interval) {
+		next_a = a + interval;
+		if (next_a > 2 * PI) {
+			next_a = 2 * PI;
+		}
+
+		glBegin(GL_TRIANGLES);
+		//Top
+		glColor3f((a + 0.05) / (2 * PI), (a + 0.3) / (2 * PI), height / 2);
+
+		glVertex3f(0.0f, height / 2, 0.0f);
+		glVertex3f(radius * sin(a), height / 2, radius * cos(a));
+		glVertex3f(radius * sin(next_a), height / 2, radius * cos(next_a));
+
+		//Bottom
+		glColor3f((a + 0.05) / (2 * PI), (a + 0.3) / (2 * PI), 0.0f);
+
+		glVertex3f(0.0f, -height / 2, 0.0f);
+		glVertex3f(radius * sin(next_a), -height / 2, radius * cos(next_a));
+		glVertex3f(radius * sin(a), -height / 2, radius * cos(a));
+
+		for (float h = -height / 2; h < height / 2; h += height) {
+			next_h = h + height;
+			if (next_h > height / 2) {
+				next_h = height / 2;
+			}
+			//Walls
+			glColor3f((h + height / 2) / height, (a + 0.3) / (2 * PI), (h + height / 2) / height);
+
+			glVertex3f(radius * sin(next_a), next_h, radius * cos(next_a));
+			glVertex3f(radius * sin(a), next_h, radius * cos(a));
+			glVertex3f(radius * sin(next_a), h, radius * cos(next_a));
+
+			glColor3f((a + 0.05) / (2 * PI), (a + 0.3) / (2 * PI), (h + height / 2) / height);
+
+			glVertex3f(radius * sin(a), next_h, radius * cos(a));
+			glVertex3f(radius * sin(a), h, radius * cos(a));
+			glVertex3f(radius * sin(next_a), h, radius * cos(next_a));
+
+		}
+		glEnd();
+	}
+}
+
 
 void renderScene(void) {
 
@@ -47,7 +132,8 @@ void renderScene(void) {
 
 
 // put drawing instructions here
-
+	drawPlane(4);
+	drawCylinder(1,3,30);
 
 	// End of frame
 	glutSwapBuffers();
