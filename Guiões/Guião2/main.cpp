@@ -1,12 +1,30 @@
+#include <math.h>
+#include <ctime>
+#include <iostream>
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
 #endif
 
-#include <math.h>
-
 #define PI 3.1415926535897932384626433832795
+
+struct Polar {
+	double radius;
+	double alpha;
+	double beta;
+};
+
+Polar camPos = { sqrt(100), PI, PI };
+
+double polarX(Polar polar) { return polar.radius * cos(polar.beta) * sin(polar.alpha); }
+double polarY(Polar polar) { return polar.radius * sin(polar.beta); }
+double polarZ(Polar polar) { return polar.radius * cos(polar.beta) * cos(polar.alpha); }
+
+//For FPS
+int timebase;
+float frame;
 
 void changeSize(int w, int h) {
 
@@ -33,7 +51,24 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-// draw figures
+// Draw Figures
+
+void drawAxis() {
+	glBegin(GL_LINES);
+	// X axis in Red
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(100.0f, 0.0f, 0.0f);
+	glVertex3f(-100.0f, 0.0f, 0.0f);
+	// Y Axis in Green
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, 100.0f, 0.0f);
+	glVertex3f(0.0f, -100.0f, 0.0f);
+	// Z Axis in Blue
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 100.0f);
+	glVertex3f(0.0f, 0.0f, -100.0f);
+	glEnd();
+}
 
 void drawPlane(float width) {
 	width/=2;
@@ -80,14 +115,14 @@ void drawCylinder(float radius, float height, int slices) {
 
 		glBegin(GL_TRIANGLES);
 		//Top
-		glColor3f((a + 0.05) / (2 * PI), (a + 0.3) / (2 * PI), height / 2);
+		glColor3f(0.698f, 0.133f, 0.133f);
 
 		glVertex3f(0.0f, height / 2, 0.0f);
 		glVertex3f(radius * sin(a), height / 2, radius * cos(a));
 		glVertex3f(radius * sin(next_a), height / 2, radius * cos(next_a));
 
 		//Bottom
-		glColor3f((a + 0.05) / (2 * PI), (a + 0.3) / (2 * PI), 0.0f);
+		glColor3f(0.698f, 0.133f, 0.133f);
 
 		glVertex3f(0.0f, -height / 2, 0.0f);
 		glVertex3f(radius * sin(next_a), -height / 2, radius * cos(next_a));
@@ -99,7 +134,7 @@ void drawCylinder(float radius, float height, int slices) {
 				next_h = height / 2;
 			}
 			//Walls
-			glColor3f((h + height / 2) / height, (a + 0.3) / (2 * PI), (h + height / 2) / height);
+			glColor3f(1.0f, 0.271f, 0.0f);
 
 			glVertex3f(radius * sin(next_a), next_h, radius * cos(next_a));
 			glVertex3f(radius * sin(a), next_h, radius * cos(a));
@@ -124,29 +159,58 @@ void renderScene(void) {
 
 	// set the camera
 	glLoadIdentity();
-	gluLookAt(5.0,5.0,5.0, 
-		      0.0,0.0,0.0,
-			  0.0f,1.0f,0.0f);
+	gluLookAt(polarX(camPos), polarY(camPos), polarZ(camPos), 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);
 
 // put the geometric transformations here
 
 
 // put drawing instructions here
+	drawAxis();
 	drawPlane(4);
 	drawCylinder(1,3,30);
 
+	//FPS counter
+	frame++;
+	int final_time = glutGet(GLUT_ELAPSED_TIME);
+
+	if (final_time - timebase > 1000) {
+		int fps = frame * 1000.0f / (final_time - timebase);
+		char title[(((sizeof fps) * CHAR_BIT) + 2) / 3 + 2];
+		sprintf(title,"FPS: %d", fps);
+		glutSetWindowTitle(title);
+		timebase = final_time;
+		frame = 0;
+	}
+
 	// End of frame
 	glutSwapBuffers();
-}
 
+}
 
 
 // write function to process keyboard events
 
-
-
-
-
+void keyboardFunc(unsigned char key, int x, int y) {
+	switch (key) {
+	case 'a':
+		camPos.alpha -= PI / 16;
+		break;
+	case 'd':
+		camPos.alpha += PI / 16;
+		break;
+	case 'w':
+		if (camPos.beta - PI/16 >= -PI/2) {
+			camPos.beta -= PI / 16;
+		}
+		break;
+	case 's':
+		if (camPos.beta + PI/16 <= PI/2) {
+			camPos.beta += PI / 16;
+		}
+		break;
+	}
+	glutPostRedisplay();
+}
 
 int main(int argc, char **argv) {
 
@@ -155,11 +219,30 @@ int main(int argc, char **argv) {
 	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(800,800);
-	glutCreateWindow("CG@DI-UM");
-		
+	glutCreateWindow("CG");
+	
+
 // Required callback registry 
+	glutIdleFunc(renderScene);
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
+	//FPS 
+	timebase = glutGet(GLUT_ELAPSED_TIME);
+
+// put here the registration of the keyboard callbacks
+	glutKeyboardFunc(keyboardFunc);
+
+
+//  OpenGL settings
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	
+// enter GLUT's main cycle
+	glutMainLoop();
+	
+	return 1;
+}
+
 
 	
 // put here the registration of the keyboard callbacks
