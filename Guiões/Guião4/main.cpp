@@ -15,10 +15,8 @@
 float alfa = 0.0f, beta = 0.5f, radius = 100.0f;
 float camX, camY, camZ;
 
-void timer(int value) {
-	glutPostRedisplay();
-	glutTimerFunc(1, timer, 0);
-}
+//To Rotate
+int k = 0;
 
 void spherical2Cartesian() {
 
@@ -48,6 +46,10 @@ void drawTree() {
 }
 
 void drawIndians() {
+
+	glPushMatrix();
+	glRotatef(k, 0.0f, 1.0f, 0.0f);
+
 	for (int i = 0; i < 16; i++) {
 		glPushMatrix();
 		glTranslatef(0, 3, 0);
@@ -57,9 +59,12 @@ void drawIndians() {
 		glutSolidTeapot(2);
 		glPopMatrix();
 	}
+	glPopMatrix();
 }
 
 void drawCowBoys() {
+	glPushMatrix();
+	glRotatef(-k, 0.0f, 1.0f, 0.0f);
 	for (int i = 0; i < 16; i++) {
 		glPushMatrix();
 		glTranslatef(0, 3, 0);
@@ -69,6 +74,7 @@ void drawCowBoys() {
 		glutSolidTeapot(2);
 		glPopMatrix();
 	}
+	glPopMatrix();
 }
 
 void drawCenter() {
@@ -133,7 +139,10 @@ void renderScene(void) {
 	drawIndians();
 	drawCowBoys();
 	drawCenter();
+	k++;
 
+	glutPostRedisplay();
+	
 	glutSwapBuffers();
 }
 
@@ -214,8 +223,6 @@ int main(int argc, char** argv) {
 	spherical2Cartesian();
 
 	printInfo();
-
-	glutTimerFunc(0, timer, 0);
 
 	// enter GLUT's main cycle
 	glutMainLoop();
